@@ -172,3 +172,9 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+<<<<<<< HEAD
+=======
+
+# CeneoWebScraper
+config.py
+>>>>>>> t_repo/main
