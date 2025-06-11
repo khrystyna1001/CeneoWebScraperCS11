@@ -1,5 +1,191 @@
 {% extends 'base.html' %}
-{% block title %}{{product_id}}{% endblock %}
+{% block title %}{{ product.product_name }} - Details{% endblock %}
 {% block content %}
+    <div class="product-details">
+        ---
+        <h3>Product Statistics</h3>
+        <p>Total Opinions: **{{ product.stats.opinions_count }}**</p>
+        <p>Average Rating: **{{ "%.2f"|format(product.stats.average_rate) }}** / 5.0</p>
+        <p>Opinions with Pros: **{{ product.stats.pros_count }}**</p>
+        <p>Opinions with Cons: **{{ product.stats.cons_count }}**</p>
+        <p>Opinions with Both Pros & Cons: **{{ product.stats.pros_cons_count }}**</p>
 
+        <h4>Recommendations:</h4>
+        <ul>
+            {% for recommendation, count in product.stats.recommendations.items() %}
+                <li>
+                    {# Ensure recommendation is treated as string if JSON saves it that way #}
+                    {% if recommendation == 'True' %}
+                        Recommended:
+                    {% elif recommendation == 'False' %}
+                        Not Recommended:
+                    {% else %}
+                        No recommendation stated:
+                    {% endif %}
+                    **{{ count }}**
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h4>Most Frequent Pros:</h4>
+        {% if product.stats.pros %}
+            <ul>
+                {% for pro, count in product.stats.pros.items() %}
+                    <li>{{ pro }}: **{{ count }}**</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No common pros identified.</p>
+        {% endif %}
+
+        <h4>Most Frequent Cons:</h4>
+        {% if product.stats.cons %}
+            <ul>
+                {% for con, count in product.stats.cons.items() %}
+                    <li>{{ con }}: **{{ count }}**</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No common cons identified.</p>
+        {% endif %}
+        <br>
+        <a href="{{ url_for('view_charts', product_id=product.product_id) }}"><button>View Charts</button></a>
+        <br>
+        <br>
+        <a href="{{ url_for('tocsv', product_id=product.product_id) }}"><button>Download .csv</button></a>
+        <a href="{{ url_for('tojson', product_id=product.product_id) }}"><button>Download .json</button></a>
+        <a href="{{ url_for('toexcel', product_id=product.product_id) }}"><button>Download .xlsx</button></a>
+        <br>
+        ---
+        <h3>All Opinions ({{ product.stats.opinions_count }})</h3>
+        <table>
+            <thead> {# It's good practice to wrap table headers in <thead> #}
+                <tr>
+                    <th>Opinion Author</th>
+                    <th>Stars</th>
+                    <th>Recommended</th>
+                    <th>Publish Date</th>
+                    <th>Purchase Date</th>
+                    <th>Content (PL)</th>
+                    <th>Content (EN)</th>
+                    <th>Pros (PL)</th>
+                    <th>Pros (EN)</th>
+                    <th>Cons (PL)</th>
+                    <th>Cons (EN)</th>
+                    <th>Up Votes</th>
+                    <th>Down Votes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if product.opinions %}
+                    {% for opinion in product.opinions %}
+                        <tr> {# Start a new row for each opinion #}
+                            <td>{{ opinion.author }}</td>
+                            <td>{{ "%.1f"|format(opinion.stars) }} / 5.0</td>
+                            <td>
+                                {% if opinion.recommendation == True %}
+                                    Recommended
+                                {% elif opinion.recommendation == False %}
+                                    Not Recommended
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            {# Use default filter for dates #}
+                            <td>{{ opinion.publish_date | default('-') }}</td>
+                            <td>{{ opinion.purchase_date | default('-') }}</td>
+                            <td>{{ opinion.content_pl | default('-') }}</td>
+                            <td>{{ opinion.content_en | default('-') }}</td>
+
+                            <td> {# Pros (PL) cell #}
+                                {% if opinion.pros_pl %}
+                                    <ul>
+                                        {% for pro in opinion.pros_pl %}
+                                            <li>{{ pro }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td> {# Pros (EN) cell #}
+                                {% if opinion.pros_en %}
+                                    <ul>
+                                        {% for pro in opinion.pros_en %}
+                                            <li>{{ pro }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td> {# Cons (PL) cell #}
+                                {% if opinion.cons_pl %}
+                                    <ul>
+                                        {% for con in opinion.cons_pl %}
+                                            <li>{{ con }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td> {# Cons (EN) cell #}
+                                {% if opinion.cons_en %}
+                                    <ul>
+                                        {% for con in opinion.cons_en %}
+                                            <li>{{ con }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td>{{ opinion.vote_yes }}</td>
+                            <td>{{ opinion.vote_no }}</td>
+                        </tr> {# End the row for the current opinion #}
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="13">No opinions found for this product.</td> {# colspan to span all columns #}
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        <br>
+        <a href="{{ url_for('tocsv', product_id=product.product_id) }}"><button>Download .csv</button></a>
+        <a href="{{ url_for('tojson', product_id=product.product_id) }}"><button>Download .json</button></a>
+        <a href="{{ url_for('toexcel', product_id=product.product_id) }}"><button>Download .xlsx</button></a>
+    </div>
+    <br>
+    <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+          margin-top: 20px;
+        }
+
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+          vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+          background-color: #f2f2f2;
+        }
+
+        td ul {
+            margin: 0;
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+        td ul li {
+            margin-bottom: 2px; 
+        }
+    </style>
 {% endblock %}

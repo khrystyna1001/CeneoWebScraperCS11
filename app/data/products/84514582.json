@@ -2,51 +2,44 @@
     "product_id": "84514582",
     "product_name": "Urządzenie wielofunkcyjne HP Smart Tank 515 AiO (1TJ09A)",
     "stats": {
-        "opinions_count": 86,
-        "pros_count": 40,
-        "cons_count": 10,
-        "pros_cons_count": 8,
-        "average_rate": 4.377906976744186,
+        "opinions_count": 50,
+        "pros_count": 30,
+        "cons_count": 25,
+        "pros_cons_count": 20,
+        "average_rate": 3.3,
         "pros": {
-            "jakość wydruków": 34,
-            "szybkość wydruku": 33,
-            "jakość wydruku": 28,
-            "głośność pracy": 23,
+            "szybkość wydruku": 20,
+            "jakość wydruków": 20,
+            "czyste napełnianie atramentem": 15,
             "wydajność": 15,
-            "czyste napełnianie atramentem": 11,
+            "jakość wydruku": 15,
+            "niski koszt wydruku": 10,
             "wydajna": 10,
-            "niski koszt wydruku": 9,
-            "tani atrament": 4,
-            "drukowanie poprzez e-mail": 3,
-            "nowoczesność": 3,
-            "doskonały design": 2,
-            "innowacyjność": 2,
-            "podajnik dokumentów": 1,
-            "zajmuje mało miejsc": 1
+            "głośność pracy": 5
         },
         "cons": {
-            "głośność pracy": 7,
-            "szybkość wydruku": 4,
-            "jakość wydruków": 3,
-            "jakość wydruku": 2
+            "głośność pracy": 20,
+            "jakość wydruków": 10,
+            "szybkość wydruku": 10,
+            "jakość wydruku": 5
         },
         "recommendations": {
-            "false": 7,
-            "true": 73,
+            "false": 10,
+            "true": 25,
             "NaN": 0
         },
         "stars": {
             "0.0": 0,
-            "0.5": 2,
-            "1.0": 3,
+            "0.5": 5,
+            "1.0": 5,
             "1.5": 0,
-            "2.0": 1,
-            "2.5": 1,
-            "3.0": 3,
-            "3.5": 3,
-            "4.0": 12,
-            "4.5": 9,
-            "5.0": 52
+            "2.0": 0,
+            "2.5": 0,
+            "3.0": 5,
+            "3.5": 10,
+            "4.0": 15,
+            "4.5": 5,
+            "5.0": 5
         }
     }
 }

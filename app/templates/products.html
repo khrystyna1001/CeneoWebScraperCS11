@@ -5,9 +5,21 @@
         <ul class="product_list">
             {% for product in products %}
                 <li>
-                        <strong>{{ product.product_name }}</strong>
-                         (ID: {{ product.product_id }})
+                        <a href="{{ url_for('product', product_id=product.product_id) }}"><strong>{{ product.product_name }}</strong>
+                         (ID: {{ product.product_id }})</a>
+                         <br>
+                         <br>
+                         <pre>Total opinions: {{ product.stats.opinions_count }}</pre>
+                         <pre>Average Rating: {{ "%.2f"|format(product.stats.average_rate) }} / 5.0</pre>
+                         <pre>Opinions with Pros: {{ product.stats.pros_count }}</pre>
+                         <pre>Opinions with Cons: {{ product.stats.cons_count }}</pre>
+
+                         <a href="{{ url_for('tocsv', product_id=product.product_id) }}"><button>Download .csv</button></a>
+                         <a href="{{ url_for('tojson', product_id=product.product_id) }}"><button>Download .json</button></a>
+                         <a href="{{ url_for('toexcel', product_id=product.product_id) }}"><button>Download .xlsx</button></a>
+                         
                 </li>
+                <br>
             {% endfor %}
         </ul>
     {% else %}

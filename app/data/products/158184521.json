@@ -1,0 +1,35 @@
+{
+    "product_id": "158184521",
+    "product_name": "Konsola Sony PlayStation 5 Digital Edition D Chassis (Slim)",
+    "stats": {
+        "opinions_count": 10,
+        "pros_count": 6,
+        "cons_count": 0,
+        "pros_cons_count": 0,
+        "average_rate": 4.5,
+        "pros": {
+            "grywalność": 6,
+            "jakość": 6,
+            "możliwości": 6
+        },
+        "cons": {},
+        "recommendations": {
+            "false": 1,
+            "true": 8,
+            "NaN": 0
+        },
+        "stars": {
+            "0.0": 0,
+            "0.5": 0,
+            "1.0": 0,
+            "1.5": 1,
+            "2.0": 0,
+            "2.5": 0,
+            "3.0": 0,
+            "3.5": 1,
+            "4.0": 0,
+            "4.5": 0,
+            "5.0": 8
+        }
+    }
+}

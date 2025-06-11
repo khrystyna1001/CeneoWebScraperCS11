@@ -1,4 +1,5 @@
 import os
+import io
 import json
 import pandas as pd
 import numpy as np
@@ -6,6 +7,10 @@ import requests
 from bs4 import BeautifulSoup
 from config_schema import headers
 from app.utils import extract_data, translate_data
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 
 class Product:
     def __init__(self, product_id, product_name="", opinions=[], stats={}):
@@ -73,7 +78,7 @@ class Product:
         }
     
     def import_opinions(self):
-        with open(f".app/data/opinions/{self.product_id}.json", "r", encoding="UTF-8") as jf:
+        with open(f"./app/data/opinions/{self.product_id}.json", "r", encoding="UTF-8") as jf:
             opinions = json.load(jf)
         for opinion in opinions:
             single_opinion = Opinion()
@@ -82,7 +87,7 @@ class Product:
             self.opinions.append(single_opinion)
 
     def import_info(self):
-        with open(f".app/data/products/{self.product_id}.json", "r", encoding="UTF-8") as jf:
+        with open(f"./app/data/products/{self.product_id}.json", "r", encoding="UTF-8") as jf:
             info = json.load(jf)
         self.product_name = info['product_name']
         self.stats = info['stats']
@@ -98,6 +103,53 @@ class Product:
         self.stats["cons"] = opinions.cons_pl.explode().value_counts().to_dict()
         self.stats["recommendations"] = opinions.recommendation.value_counts(dropna=False).reindex([False, True, np.nan], fill_value=0).to_dict()
         self.stats["stars"] = opinions.stars.value_counts().reindex(list(np.arange(0,5.5,0.5)), fill_value=0).to_dict()
+    
+    def to_df(self):
+        return pd.DataFrame.from_dict([opinion.transform_to_dict() for opinion in self.opinions])
+
+    def to_csv(self):
+        df = self.to_df()
+        return df.to_csv(index=False)
+
+    def to_json(self):
+        df = self.to_df()
+        return df.to_json(orient="split")
+
+    def to_excel(self):
+        df = self.to_df()
+        buffer = io.BytesIO()
+        with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+            df.to_excel(writer, index='False', sheet_name=f'{self.product_id}')
+        buffer.seek(0)
+        return buffer
+
+    def make_charts(self):
+        opinions_df = self.to_df()
+        if not os.path.exists("./app/data/pie_chart"):
+            os.mkdir("./app/data/pie_chart")
+        recommendations = opinions_df.recommendation.value_counts(dropna=False).reindex([False, True, None], fill_value=0)
+        recommendations.plot.pie(
+            label = "",
+            labels = ["Not Recommend", "Recommend", "No opinion"],
+            colors = ["crimson", "forestgreen", "silver"],
+            autopct = lambda v: f"{v:.1f}%" if v > 0 else "",
+            title=f"Share of recommendations in the total number of opinions \nabout the product {self.product_id}"
+        )
+        plt.savefig(f"./app/data/pie_chart/{self.product_id}.png")
+        plt.close()
+        if not os.path.exists("./app/data/bar_chart"):
+            os.mkdir("./app/data/bar_chart")
+        stars = opinions_df.stars.value_counts().reindex(list(np.arange(0, 5.5, 0.5)), fill_value=0)
+        ax = stars.plot.bar(
+            xlabel = "Rate (number of stars in range 0 to 5)",
+            ylabel = "Count of rates (number of opinions)",
+            title = f"Number of opinions about the product {self.product_id}\nwith certain number of stars assigned",
+            color = ["crimson" if x<3 else "forestgreen" if x>3.5 else "silver" for x in stars.index]
+        )
+        plt.xticks(rotation=0)
+        plt.bar_label(container=ax.containers[0])
+        plt.savefig(f"./app/data/bar_chart/{self.product_id}.png")
+        plt.close()
 
 class Opinion:
     selectors = {

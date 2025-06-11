@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Project description{% endblock %}
+{% block content %}
+<h3>Visualizations</h3>
+<div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+    <div style="margin: 10px; text-align: center;">
+        <h4>Recommendations Pie Chart</h4>
+        <img src="{{ url_for('view_pie_chart', product_id=product.product_id) }}"
+             alt="Recommendations Pie Chart" style="max-width: 500px; height: auto;">
+    </div>
+    <div style="margin: 10px; text-align: center;">
+        <h4>Star Distribution Bar Chart</h4>
+        <img src="{{ url_for('view_bar_chart', product_id=product.product_id) }}"
+             alt="Star Distribution Bar Chart" style="max-width: 600px; height: auto;">
+    </div>
+</div>
+<br>
+<a href="{{ url_for('product', product_id=product.product_id) }}"><button>Go Back To Product Page</button></a>
+<br>
+<br>
+{% endblock %}

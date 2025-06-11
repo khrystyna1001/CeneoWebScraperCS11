@@ -1,7 +1,8 @@
 import os
+import io
 import json
 from app import app
-from flask import render_template, redirect, url_for, request
+from flask import render_template, redirect, url_for, request, send_file, send_from_directory
 from app.forms import ExtractForm
 from app.models import Product
 
@@ -25,6 +26,7 @@ def extract():
             product.analyze()
             product.export_info()
             product.export_opinions()
+            product.make_charts()
             return redirect(url_for('product', product_id=product_id))
         form.product_id.errors.append('There is no product for provided id or product has no opinions')
         return render_template('extract.html', form=form)
@@ -44,7 +46,8 @@ def products():
                         product_data = json.load(f)
                         products_list.append({
                             'product_id': product_data.get('product_id'),
-                            'product_name': product_data.get('product_name')
+                            'product_name': product_data.get('product_name'),
+                            'stats': product_data.get('stats', {})
                         })
                 except Exception as e:
                     print(f"Error reading prodcut file {filename}: {e}")
@@ -66,3 +69,86 @@ def product(product_id):
 @app.route("/about")
 def about():
     return render_template("about.html")
+
+@app.route("/product/<product_id>/tocsv")
+def tocsv(product_id):
+    product = Product(product_id)
+    try:
+        product.import_opinions() 
+        csv_data = product.to_csv()
+        buffer = io.BytesIO()
+        buffer.write(csv_data.encode('utf-8'))
+        buffer.seek(0)
+        return send_file(buffer,
+                         mimetype='text/csv',
+                         as_attachment=True,
+                         download_name=f"{product_id}_opinions.csv")
+    except FileNotFoundError:
+            return "Opinions data not found for this product.", 404
+    except Exception as e:
+        return f"An error occurred while generating CSV: {e}", 500
+
+@app.route("/product/<product_id>/tojson")
+def tojson(product_id):
+    product = Product(product_id)
+    try:
+        product.import_opinions() 
+        json_data = product.to_json()
+        buffer = io.BytesIO()
+        buffer.write(json_data.encode('utf-8'))
+        buffer.seek(0)
+        return send_file(buffer,
+                         mimetype='application/json',
+                         as_attachment=True,
+                         download_name=f"{product_id}_opinions.json")
+    except FileNotFoundError:
+            return "Opinions data not found for this product.", 404
+    except Exception as e:
+        return f"An error occurred while generating JSON: {e}", 500
+
+@app.route("/product/<product_id>/toexcel")
+def toexcel(product_id):
+    product = Product(product_id)
+    try:
+        product.import_opinions() 
+        excel_data = product.to_excel()
+        return send_file(excel_data,
+                         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                         as_attachment=True,
+                         download_name=f"{product_id}_opinions.xlsx")
+    except FileNotFoundError:
+            return "Opinions data not found for this product.", 404
+    except Exception as e:
+        return f"An error occurred while generating EXCEL: {e}", 500
+
+@app.route("/charts/pie/<product_id>")
+def view_pie_chart(product_id):
+    pie_chart_dir = os.path.join(app.root_path, "data", "pie_chart")
+    filename = f"{product_id}.png"
+    try:
+        return send_from_directory(pie_chart_dir, filename)
+    except Exception as e:
+        return f"Error serving pie chart: {e}"
+
+@app.route("/charts/bar/<product_id>")
+def view_bar_chart(product_id):
+    bar_chart_dir = os.path.join(app.root_path, "data", "bar_chart")
+    filename = f"{product_id}.png"
+    try:
+        return send_from_directory(bar_chart_dir, filename)
+    except Exception as e:
+        return f"Error serving bar chart: {e}"
+
+@app.route("/charts/<product_id>/view")
+def view_charts(product_id):
+    product = Product(product_id)
+    try:
+        product.import_info()
+    except FileNotFoundError:
+        flash("Product data not found for charts.", "error")
+        return redirect(url_for('products')) 
+    except Exception as e:
+        flash(f"An error occurred while preparing charts: {e}", "error")
+        return redirect(url_for('product', product_id=product_id))
+
+    return render_template('chart.html', product=product)
