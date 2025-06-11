@@ -2,9 +2,76 @@
 {% block title %}Project description{% endblock %}
 {% block content %}
 <ul>
-    <li>Purpose of the application</li>
-    <li>Description of the application's operation</li>
-    <li>Libraries/Packages used</li>
-    <li>Applied approaches</li>
+    <li>Purpose of the application
+        <p>Web application for extracting
+            product reviews from the Ceneo.pl website based on their individual codes and for
+            displaying the downloaded opinions and basic statistics about them.</p>
+    </li>
+    <li>Description of the application's operation
+        <ul>
+            <li>Analysis of the structure of the webpage.</li>
+            <li>Send http request to access page with opinions.</li>
+            <li>Check the status code of http response.</li>
+            <li>Parse the html code of first page with opinions</li>
+            <li>Extract required data from parsed code</li>
+            <li>If there are more pages, move to the next page and repeat steps 2-6 for each one of them
+                save extracted data</li>
+        </ul>
+    </li>
+    <li>Libraries/Packages used: 
+        <ul>
+            <li>Flask</li>
+            <li>Requests & BeautifulSoup4</li>
+            <li>Pandas & NumPy</li>
+            <li>Matplotlib</li>
+            <li>Deep_translator</li>
+            <li>XlsxWriter</li>
+            <li>Flask_WTF</li>
+            <li>Jinja</li>
+            <li>io, oi & json</li>
+        </ul>
+    <li>Applied approaches 
+        <p>
+            The application's functionality is exposed through the following Flask endpoints (routes):
+        </p>
+        <ul>
+            <li>
+                /: Renders the application's main homepage.
+            </li>
+            <li>
+                /extract (GET): Displays the form for entering a Ceneo product ID to begin extraction.
+            </li>
+            <li>
+                /extract (POST): Processes the submitted product ID, initiates the scraping, analysis, chart generation, and data saving, then redirects to the product's detail page.
+            </li>
+            <li>
+                /products: Lists all products for which data has been previously extracted.
+            </li>
+            <li>
+                /product/<product_id>: Displays detailed statistics and basic information for a specific product. Includes links to export data and view charts.
+            </li>
+            <li>
+                /about: Provides information about the project author.
+            </li>
+            <li>
+                /product/<product_id>/tocsv: Allows downloading of a product's opinions in CSV format.
+            </li>
+            <li>
+                /product/<product_id>/tojson: Allows downloading of a product's opinions in JSON format.
+            </li>
+            <li>
+                /product/<product_id>/toexcel: Allows downloading of a product's opinions in Excel (.xlsx) format.
+            </li>
+            <li>
+                /charts/pie/<product_id>: Serves the dynamically generated pie chart image for a given product ID.
+            </li>
+            <li>
+                /charts/bar/<product_id>: Serves the dynamically generated bar chart image for a given product ID.
+            </li>
+            <li>
+               /charts/<product_id>/view: Renders a dedicated page to display both the pie and bar charts for a specific product. 
+            </li>
+        </ul>
+    </li>
 </ul>
 {% endblock %}
